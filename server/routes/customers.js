@@ -26,7 +26,7 @@ router.get('/', authMiddleware, async (req, res) => {
       phone: c.phone,
       email: c.email,
       address: c.address,
-      points: c.points,
+      points: c.loyalty_points || 0,
       totalSpent: parseFloat(c.total_spent),
       visitCount: c.visit_count,
       createdAt: c.created_at
@@ -55,7 +55,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
       phone: customer.phone,
       email: customer.email,
       address: customer.address,
-      points: customer.points,
+      points: customer.loyalty_points || 0,
       totalSpent: parseFloat(customer.total_spent),
       visitCount: customer.visit_count,
       transactions

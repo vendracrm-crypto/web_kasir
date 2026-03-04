@@ -119,7 +119,7 @@ const Users = () => {
   return (
     <div className="products-page">
       <div className="page-header">
-        <h1>Manajemen User</h1>
+        <h1>Pengaturan</h1>
         <button className="add-btn" onClick={() => setShowModal(true)}>
           <FaPlus /> Tambah User
         </button>
@@ -142,7 +142,7 @@ const Users = () => {
               <tr key={user.id}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    {user.role === 'admin' ? <FaUserShield color="#3b82f6" /> : <FaUser color="#10b981" />}
+                    {user.role === 'admin' ? <FaUserShield color="var(--brand-500)" /> : <FaUser color="var(--success-600)" />}
                     {user.username}
                   </div>
                 </td>
@@ -158,7 +158,7 @@ const Users = () => {
                     <button className="edit-btn" onClick={() => handleEdit(user)} title="Edit User">
                       <FaEdit />
                     </button>
-                    <button className="password-btn" onClick={() => handleChangePassword(user)} title="Ubah Password" style={{ background: '#8b5cf6' }}>
+                    <button className="password-btn" onClick={() => handleChangePassword(user)} title="Ubah Password" style={{ background: 'var(--brand-500)' }}>
                       <FaKey />
                     </button>
                     <button className="delete-btn" onClick={() => handleDelete(user.id)} title="Hapus User">
@@ -192,7 +192,7 @@ const Users = () => {
               <button className="edit-btn" onClick={() => handleEdit(user)}>
                 <FaEdit /> Edit
               </button>
-              <button className="password-btn" onClick={() => handleChangePassword(user)} style={{ background: '#8b5cf6' }}>
+              <button className="password-btn" onClick={() => handleChangePassword(user)} style={{ background: 'var(--brand-500)' }}>
                 <FaKey /> Password
               </button>
               <button className="delete-btn" onClick={() => handleDelete(user.id)}>
@@ -285,7 +285,7 @@ const Users = () => {
         <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <h2>Ubah Password</h2>
-            <p style={{ color: '#64748b', marginBottom: '20px' }}>
+            <p style={{ color: 'var(--gray-500)', marginBottom: '20px' }}>
               Ubah password untuk user: <strong>{selectedUser?.username}</strong>
             </p>
             <form onSubmit={submitPasswordChange}>

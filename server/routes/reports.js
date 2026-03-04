@@ -140,4 +140,182 @@ router.get('/inventory', authMiddleware, async (req, res) => {
   }
 });
 
+// ============================================
+// Export Vendra CSV - Compatible with Vendra CRM Import
+// ============================================
+router.get('/export-vendra', authMiddleware, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    let dateFilter = '';
+    let params = [];
+    
+    if (startDate && endDate) {
+      dateFilter = ' AND DATE(t.created_at) BETWEEN ? AND ?';
+      params.push(startDate, endDate);
+    }
+    
+    const [rows] = await db.query(`
+      SELECT 
+        t.invoice_number,
+        t.created_at,
+        t.payment_method,
+        t.currency,
+        t.tax_amount,
+        c.name as customer_name,
+        c.phone as customer_phone,
+        c.email as customer_email,
+        p.brand,
+        cat.name as item_group,
+        p.name as item_name,
+        p.sku as item_sku,
+        ti.quantity as qty,
+        ti.unit_price as price,
+        ti.add_on_price,
+        ti.discount_percent,
+        ti.discount_amount,
+        ti.subtotal as amount,
+        ti.cost_per_unit,
+        ti.total_cost,
+        ti.profit,
+        ti.paid_to_brand
+      FROM transactions t
+      JOIN transaction_items ti ON t.id = ti.transaction_id
+      JOIN products p ON ti.product_id = p.id
+      LEFT JOIN categories cat ON p.category_id = cat.id
+      LEFT JOIN customers c ON t.customer_id = c.id
+      WHERE 1=1 ${dateFilter}
+      ORDER BY t.created_at ASC, t.invoice_number ASC
+    `, params);
+    
+    // Build CSV
+    const headers = [
+      'order no', 'order time', 'customer name', 'customer phone', 'customer email',
+      'brand', 'item group', 'item name', 'item sku', 'qty', 'currency',
+      'price', 'add-on price', 'discount percent', 'discount amount', 'amount',
+      'tax amount', 'cost perunit', 'total cost', 'profit', 'paid to brand', 'payment type'
+    ];
+    
+    const formatDate = (date) => {
+      const d = new Date(date);
+      return d.getFullYear() + '-' + 
+             String(d.getMonth() + 1).padStart(2, '0') + '-' +
+             String(d.getDate()).padStart(2, '0') + ' ' +
+             String(d.getHours()).padStart(2, '0') + ':' +
+             String(d.getMinutes()).padStart(2, '0') + ':' +
+             String(d.getSeconds()).padStart(2, '0');
+    };
+    
+    const paymentMap = {
+      'cash': 'CASH',
+      'card': 'CARD',
+      'qris': 'QRIS',
+      'transfer': 'TRANSFER',
+      'debit': 'DEBIT',
+      'credit': 'CREDIT',
+      'ewallet': 'EWALLET'
+    };
+    
+    const csvRows = rows.map(row => [
+      row.invoice_number,
+      formatDate(row.created_at),
+      row.customer_name || 'Customer',
+      row.customer_phone || '',
+      row.customer_email || '',
+      row.brand || 'General',
+      row.item_group || 'General',
+      row.item_name,
+      row.item_sku,
+      row.qty,
+      row.currency || 'IDR',
+      row.price,
+      row.add_on_price || 0,
+      row.discount_percent || 0,
+      row.discount_amount || 0,
+      row.amount,
+      row.tax_amount || 0,
+      row.cost_per_unit || 0,
+      row.total_cost || 0,
+      row.profit || 0,
+      row.paid_to_brand || row.amount,
+      paymentMap[row.payment_method] || 'CASH'
+    ].join(','));
+    
+    const csv = [headers.join(','), ...csvRows].join('\n');
+    
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=vendra-export-${new Date().toISOString().split('T')[0]}.csv`);
+    res.send(csv);
+    
+  } catch (error) {
+    console.error('Export Vendra error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Export Vendra as JSON (for preview)
+router.get('/export-vendra-preview', authMiddleware, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    let dateFilter = '';
+    let params = [];
+    
+    if (startDate && endDate) {
+      dateFilter = ' AND DATE(t.created_at) BETWEEN ? AND ?';
+      params.push(startDate, endDate);
+    }
+    
+    const [rows] = await db.query(`
+      SELECT 
+        t.invoice_number as orderNo,
+        t.created_at as orderTime,
+        t.payment_method as paymentType,
+        t.currency,
+        c.name as customerName,
+        c.phone as customerPhone,
+        c.email as customerEmail,
+        p.brand,
+        cat.name as itemGroup,
+        p.name as itemName,
+        p.sku as itemSku,
+        ti.quantity as qty,
+        ti.unit_price as price,
+        ti.add_on_price as addOnPrice,
+        ti.discount_percent as discountPercent,
+        ti.discount_amount as discountAmount,
+        ti.subtotal as amount,
+        t.tax_amount as taxAmount,
+        ti.cost_per_unit as costPerUnit,
+        ti.total_cost as totalCost,
+        ti.profit,
+        ti.paid_to_brand as paidToBrand
+      FROM transactions t
+      JOIN transaction_items ti ON t.id = ti.transaction_id
+      JOIN products p ON ti.product_id = p.id
+      LEFT JOIN categories cat ON p.category_id = cat.id
+      LEFT JOIN customers c ON t.customer_id = c.id
+      WHERE 1=1 ${dateFilter}
+      ORDER BY t.created_at DESC
+      LIMIT 100
+    `, params);
+    
+    const totalCount = await db.query(`
+      SELECT COUNT(*) as count
+      FROM transactions t
+      JOIN transaction_items ti ON t.id = ti.transaction_id
+      WHERE 1=1 ${dateFilter}
+    `, params);
+    
+    res.json({
+      total: totalCount[0][0].count,
+      preview: rows
+    });
+    
+  } catch (error) {
+    console.error('Export preview error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 module.exports = router;

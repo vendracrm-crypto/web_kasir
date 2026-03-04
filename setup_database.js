@@ -32,10 +32,10 @@ connection.connect((err) => {
     }
     
     console.log('✅ Old database dropped (if exists)');
-    console.log('🔄 Reading database_simple.sql...');
+    console.log('🔄 Reading database_full.sql...');
 
-    // Baca file SQL
-    const sqlFile = path.join(__dirname, 'database_simple.sql');
+    // Baca file SQL (full = sudah include Vendra fields)
+    const sqlFile = path.join(__dirname, 'database_full.sql');
     const sql = fs.readFileSync(sqlFile, 'utf8');
 
     console.log('🔄 Executing SQL commands...');

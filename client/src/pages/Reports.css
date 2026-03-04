@@ -1,0 +1,449 @@
+/* ============================================
+   REPORTS PAGE - VENDRA THEME
+   ============================================ */
+
+.reports-container {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Tabs */
+.reports-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--gray-100);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  margin-bottom: 24px;
+  width: fit-content;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--gray-600);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Outfit', sans-serif;
+}
+
+.tab-btn:hover {
+  color: var(--gray-900);
+}
+
+.tab-btn.active {
+  background: white;
+  color: var(--brand-600);
+  box-shadow: var(--shadow-sm);
+}
+
+.tab-btn svg {
+  flex-shrink: 0;
+}
+
+/* Stats for Reports */
+.reports-content .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.reports-content .stat-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon.blue {
+  background: rgba(70, 95, 255, 0.1);
+  color: var(--brand-500);
+}
+
+.stat-icon.green {
+  background: rgba(18, 183, 106, 0.1);
+  color: var(--success-600);
+}
+
+.stat-icon.purple {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+}
+
+.reports-content .stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-500);
+}
+
+.reports-content .stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+/* Report Cards */
+.report-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.report-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.report-card-header h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.period-filter {
+  display: flex;
+  gap: 4px;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+  padding: 3px;
+}
+
+.period-filter button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--gray-600);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Outfit', sans-serif;
+}
+
+.period-filter button:hover {
+  color: var(--gray-900);
+}
+
+.period-filter button.active {
+  background: white;
+  color: var(--brand-600);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-wrapper {
+  padding: 20px;
+}
+
+/* ============================================
+   EXPORT VENDRA TAB
+   ============================================ */
+
+.export-content {
+  animation: fadeIn 0.2s ease;
+}
+
+/* Info Card */
+.export-info-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: var(--brand-25);
+  border: 1px solid var(--brand-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+}
+
+.export-info-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-100);
+  color: var(--brand-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.export-info-text h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0 0 6px 0;
+}
+
+.export-info-text p {
+  font-size: 13px;
+  color: var(--gray-600);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Export Cards */
+.export-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.export-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-100);
+  color: var(--gray-700);
+}
+
+.export-card-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.export-card-body {
+  padding: 20px;
+}
+
+/* Date Range */
+.date-range-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.date-range-row .form-group {
+  flex: 1;
+}
+
+.date-range-divider {
+  padding-bottom: 10px;
+  color: var(--gray-400);
+}
+
+.date-hint {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin: 12px 0 0 0;
+}
+
+/* Export Actions */
+.export-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.export-actions .btn-primary,
+.export-actions .btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.btn-secondary .spinner {
+  border: 2px solid rgba(70, 95, 255, 0.2);
+  border-top-color: var(--brand-500);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Preview Card */
+.preview-card {
+  animation: slideUp 0.3s ease;
+}
+
+.preview-table-wrapper {
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.preview-table-wrapper .vendra-table {
+  margin: 0;
+  border-radius: 0;
+  border: none;
+  font-size: 13px;
+}
+
+.preview-table-wrapper .vendra-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.preview-table-wrapper .vendra-table td {
+  white-space: nowrap;
+}
+
+.invoice-badge {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.brand-badge {
+  background: var(--brand-50);
+  color: var(--brand-700);
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.payment-badge {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.text-muted { color: var(--gray-500); font-size: 12px; }
+.text-bold { font-weight: 600; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-success { color: var(--success-600); }
+.text-danger { color: var(--error-500); }
+
+.preview-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--gray-100);
+  font-size: 13px;
+  color: var(--gray-500);
+  text-align: center;
+  background: var(--gray-25);
+}
+
+/* CSV Format Card */
+.format-card {
+  border-color: var(--gray-200);
+}
+
+.format-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+  margin: 0 0 12px 0;
+}
+
+.format-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.format-column-tag {
+  background: var(--gray-50);
+  color: var(--gray-700);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--gray-200);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .reports-tabs {
+    width: 100%;
+  }
+
+  .tab-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .reports-content .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-card-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .date-range-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .date-range-divider {
+    display: none;
+  }
+
+  .export-actions {
+    flex-direction: column;
+  }
+
+  .export-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .export-info-card {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+}

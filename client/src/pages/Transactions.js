@@ -69,7 +69,7 @@ const Transactions = () => {
               <tr key={transaction.id}>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <FaFileInvoice color="#2196F3" />
+                    <FaFileInvoice color="var(--brand-500)" />
                     {transaction.invoiceNumber}
                   </div>
                 </td>
@@ -80,7 +80,7 @@ const Transactions = () => {
                 <td>
                   <span className="category-badge">{transaction.paymentMethod}</span>
                 </td>
-                <td style={{ fontWeight: '700', color: '#2196F3' }}>
+                <td style={{ fontWeight: '700', color: 'var(--brand-600)' }}>
                   {formatRupiah(transaction.total)}
                 </td>
                 <td>
@@ -101,7 +101,7 @@ const Transactions = () => {
             <div className="product-card-header">
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                  <FaFileInvoice color="#2196F3" size={16} />
+                  <FaFileInvoice color="var(--brand-500)" size={16} />
                   <h3 style={{ margin: 0 }}>{transaction.invoiceNumber}</h3>
                 </div>
                 <p className="product-sku">{new Date(transaction.createdAt).toLocaleDateString('id-ID', { 

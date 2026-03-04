@@ -119,11 +119,19 @@ router.post('/', authMiddleware, async (req, res) => {
     const transactionId = result.insertId;
     
     for (const item of items) {
+      const costPerUnit = item.cost || 0;
+      const totalCost = costPerUnit * item.quantity;
+      const itemSubtotal = item.price * item.quantity;
+      const itemProfit = itemSubtotal - totalCost;
+      
       await connection.query(
         `INSERT INTO transaction_items 
-         (transaction_id, product_id, quantity, unit_price, subtotal) 
-         VALUES (?, ?, ?, ?, ?)`,
-        [transactionId, item.id, item.quantity, item.price, item.price * item.quantity]
+         (transaction_id, product_id, quantity, unit_price, subtotal, 
+          add_on_price, discount_percent, discount_amount, cost_per_unit, total_cost, profit, paid_to_brand) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [transactionId, item.id, item.quantity, item.price, itemSubtotal,
+         item.addOnPrice || 0, item.discountPercent || 0, item.discountAmount || 0,
+         costPerUnit, totalCost, itemProfit, item.paidToBrand || itemSubtotal]
       );
       
       await connection.query(
@@ -137,7 +145,7 @@ router.post('/', authMiddleware, async (req, res) => {
         `UPDATE customers 
          SET total_spent = total_spent + ?, 
              visit_count = visit_count + 1,
-             points = points + ?
+             loyalty_points = loyalty_points + ?
          WHERE id = ?`,
         [total, pointsEarned, customer.id]
       );

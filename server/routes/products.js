@@ -44,20 +44,23 @@ router.post('/upload-image', authMiddleware, (req, res) => {
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const { category, search } = req.query;
-    let query = 'SELECT * FROM products WHERE 1=1';
+    let query = `SELECT p.*, c.name as category 
+                 FROM products p 
+                 LEFT JOIN categories c ON p.category_id = c.id 
+                 WHERE 1=1`;
     let params = [];
     
     if (category && category !== 'all') {
-      query += ' AND category = ?';
+      query += ' AND c.name = ?';
       params.push(category);
     }
     
     if (search) {
-      query += ' AND (name LIKE ? OR sku LIKE ?)';
+      query += ' AND (p.name LIKE ? OR p.sku LIKE ?)';
       params.push(`%${search}%`, `%${search}%`);
     }
     
-    query += ' ORDER BY created_at DESC';
+    query += ' ORDER BY p.created_at DESC';
     
     const [products] = await db.query(query, params);
     res.json(products);
@@ -69,7 +72,10 @@ router.get('/', authMiddleware, async (req, res) => {
 // Get product by ID
 router.get('/:id', authMiddleware, async (req, res) => {
   try {
-    const [products] = await db.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
+    const [products] = await db.query(
+      `SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?`, 
+      [req.params.id]
+    );
     if (products.length === 0) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -83,18 +89,21 @@ router.get('/:id', authMiddleware, async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
   try {
     console.log('Create product request:', req.body);
-    const { name, category, price, stock, sku, description, image_url } = req.body;
+    const { name, category, price, stock, sku, description, image_url, brand, cost } = req.body;
     
     // Get category_id from category name
     const [categoryResult] = await db.query('SELECT id FROM categories WHERE name = ?', [category]);
     const category_id = categoryResult.length > 0 ? categoryResult[0].id : 1;
     
     const [result] = await db.query(
-      'INSERT INTO products (name, category_id, price, stock, sku, description, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [name, category_id, price, stock, sku, description, image_url || '']
+      'INSERT INTO products (name, category_id, price, stock, sku, description, image_url, brand, cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [name, category_id, price, stock, sku, description, image_url || '', brand || 'General', cost || 0]
     );
     
-    const [newProduct] = await db.query('SELECT * FROM products WHERE id = ?', [result.insertId]);
+    const [newProduct] = await db.query(
+      `SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?`, 
+      [result.insertId]
+    );
     console.log('Product created successfully:', newProduct[0]);
     res.status(201).json(newProduct[0]);
   } catch (error) {
@@ -107,7 +116,7 @@ router.post('/', authMiddleware, async (req, res) => {
 router.put('/:id', authMiddleware, async (req, res) => {
   try {
     console.log('Update product request:', req.params.id, req.body);
-    const { name, category, price, stock, sku, description, image_url } = req.body;
+    const { name, category, price, stock, sku, description, image_url, brand, cost } = req.body;
     
     // Get category_id from category name if category is provided
     let category_id = null;
@@ -119,17 +128,20 @@ router.put('/:id', authMiddleware, async (req, res) => {
     // If category_id is not found, keep the existing one
     if (category_id) {
       await db.query(
-        'UPDATE products SET name = ?, category_id = ?, price = ?, stock = ?, sku = ?, description = ?, image_url = ? WHERE id = ?',
-        [name, category_id, price, stock, sku, description, image_url, req.params.id]
+        'UPDATE products SET name = ?, category_id = ?, price = ?, stock = ?, sku = ?, description = ?, image_url = ?, brand = ?, cost = ? WHERE id = ?',
+        [name, category_id, price, stock, sku, description, image_url, brand || 'General', cost || 0, req.params.id]
       );
     } else {
       await db.query(
-        'UPDATE products SET name = ?, price = ?, stock = ?, sku = ?, description = ?, image_url = ? WHERE id = ?',
-        [name, price, stock, sku, description, image_url, req.params.id]
+        'UPDATE products SET name = ?, price = ?, stock = ?, sku = ?, description = ?, image_url = ?, brand = ?, cost = ? WHERE id = ?',
+        [name, price, stock, sku, description, image_url, brand || 'General', cost || 0, req.params.id]
       );
     }
     
-    const [updatedProduct] = await db.query('SELECT * FROM products WHERE id = ?', [req.params.id]);
+    const [updatedProduct] = await db.query(
+      `SELECT p.*, c.name as category FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?`, 
+      [req.params.id]
+    );
     if (updatedProduct.length === 0) {
       return res.status(404).json({ message: 'Product not found' });
     }

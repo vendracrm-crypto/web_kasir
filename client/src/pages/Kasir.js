@@ -142,7 +142,14 @@ const Kasir = () => {
 
     try {
       const transactionData = {
-        items: cart,
+        items: cart.map(item => ({
+          ...item,
+          cost: item.cost || 0,
+          addOnPrice: 0,
+          discountPercent: 0,
+          discountAmount: 0,
+          paidToBrand: item.price * item.quantity
+        })),
         customer: selectedCustomer,
         paymentMethod,
         amountPaid: paid,
@@ -284,7 +291,7 @@ const Kasir = () => {
                 <select
                   value={selectedCustomer?.id || ''}
                   onChange={(e) => {
-                    const customer = customers.find(c => c.id === e.target.value);
+                    const customer = customers.find(c => String(c.id) === e.target.value);
                     setSelectedCustomer(customer || null);
                   }}
                 >
@@ -335,6 +342,8 @@ const Kasir = () => {
                       <option value="cash">Tunai</option>
                       <option value="debit">Kartu Debit</option>
                       <option value="credit">Kartu Kredit</option>
+                      <option value="qris">QRIS</option>
+                      <option value="transfer">Transfer</option>
                       <option value="ewallet">E-Wallet</option>
                     </select>
                   </div>

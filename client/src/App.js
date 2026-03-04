@@ -8,7 +8,6 @@ import Dashboard from './pages/Dashboard';
 import Kasir from './pages/Kasir';
 import Products from './pages/Products';
 import Customers from './pages/Customers';
-import Employees from './pages/Employees';
 import Users from './pages/Users';
 import Reports from './pages/Reports';
 import Inventory from './pages/Inventory';
@@ -44,11 +43,10 @@ function App() {
             <Route path="kasir" element={<Kasir />} />
             <Route path="products" element={<Products />} />
             <Route path="customers" element={<Customers />} />
-            <Route path="employees" element={<Employees />} />
             <Route path="reports" element={<Reports />} />
             <Route path="inventory" element={<Inventory />} />
             <Route path="transactions" element={<Transactions />} />
-            <Route path="users" element={<Users />} />
+            <Route path="pengaturan" element={<Users />} />
           </Route>
         </Routes>
       </Router>

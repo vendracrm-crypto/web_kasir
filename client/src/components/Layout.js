@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
-  FaHome, FaCashRegister, FaBox, FaUsers, FaUserTie, 
-  FaChartLine, FaWarehouse, FaReceipt, FaBars, FaSignOutAlt, FaUserCog 
+  FaHome, FaCashRegister, FaBox, FaUsers, 
+  FaChartLine, FaWarehouse, FaReceipt, FaBars, FaSignOutAlt, FaCog 
 } from 'react-icons/fa';
 import './Layout.css';
 
@@ -31,8 +31,7 @@ const Layout = () => {
   ];
 
   if (user?.role === 'admin') {
-    menuItems.push({ path: '/employees', icon: <FaUserTie />, label: 'Karyawan' });
-    menuItems.push({ path: '/users', icon: <FaUserCog />, label: 'Users' });
+    menuItems.push({ path: '/pengaturan', icon: <FaCog />, label: 'Pengaturan' });
   }
 
   return (
@@ -46,7 +45,10 @@ const Layout = () => {
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <h2>💼 Web Kasir</h2>
+          <div style={{ width: 32, height: 32, background: 'var(--brand-500)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <FaCashRegister style={{ color: 'white', fontSize: 16 }} />
+          </div>
+          <h2>Vendra Kasir</h2>
         </div>
         <nav className="sidebar-nav">
           {menuItems.map((item) => (

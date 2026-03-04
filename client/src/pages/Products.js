@@ -17,7 +17,9 @@ const Products = () => {
     stock: '',
     sku: '',
     description: '',
-    image_url: ''
+    image_url: '',
+    brand: '',
+    cost: ''
   });
 
   useEffect(() => {
@@ -123,7 +125,9 @@ const Products = () => {
       stock: '',
       sku: '',
       description: '',
-      image_url: ''
+      image_url: '',
+      brand: '',
+      cost: ''
     });
     setEditingProduct(null);
     setImagePreview('');
@@ -170,8 +174,10 @@ const Products = () => {
               <tr>
                 <th>SKU</th>
                 <th>Nama</th>
+                <th>Brand</th>
                 <th>Kategori</th>
                 <th>Harga</th>
+                <th>Modal</th>
                 <th>Stok</th>
                 <th>Aksi</th>
               </tr>
@@ -179,10 +185,12 @@ const Products = () => {
             <tbody>
               {filteredProducts.map(product => (
                 <tr key={product.id}>
-                  <td>{product.sku}</td>
-                  <td>{product.name}</td>
-                  <td><span className="category-badge">{product.category}</span></td>
+                  <td><span className="badge badge-brand">{product.sku}</span></td>
+                  <td><span style={{fontWeight: 600}}>{product.name}</span></td>
+                  <td>{product.brand || '-'}</td>
+                  <td><span className="badge badge-brand">{product.category}</span></td>
                   <td>{formatRupiah(product.price)}</td>
+                  <td style={{color: 'var(--gray-500)'}}>{product.cost ? formatRupiah(product.cost) : '-'}</td>
                   <td>
                     <span className={`stock-badge ${product.stock < 10 ? 'low' : ''}`}>
                       {product.stock}
@@ -268,6 +276,15 @@ const Products = () => {
 
               <div className="form-row">
                 <div className="form-group">
+                  <label>Brand</label>
+                  <input
+                    type="text"
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    placeholder="Contoh: Nichoa, General"
+                  />
+                </div>
+                <div className="form-group">
                   <label>Kategori *</label>
                   <select
                     value={formData.category}
@@ -276,16 +293,31 @@ const Products = () => {
                     <option>Makanan</option>
                     <option>Minuman</option>
                     <option>Snack</option>
+                    <option>Elektronik</option>
+                    <option>Alat Tulis</option>
                     <option>Lainnya</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="form-row">
                 <div className="form-group">
-                  <label>Harga *</label>
+                  <label>Harga Jual *</label>
                   <input
                     type="number"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
                     required
+                    placeholder="Harga jual ke customer"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Harga Modal</label>
+                  <input
+                    type="number"
+                    value={formData.cost}
+                    onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) })}
+                    placeholder="Harga modal / cost"
                   />
                 </div>
                 <div className="form-group">

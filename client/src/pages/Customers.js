@@ -163,7 +163,7 @@ const Customers = () => {
                   </button>
                   <button 
                     className="edit-btn" 
-                    style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}
+                    style={{ background: 'var(--success-50)', color: 'var(--success-700)' }}
                     onClick={() => viewCustomerHistory(customer)}
                     title="Lihat Riwayat"
                   >
@@ -214,7 +214,7 @@ const Customers = () => {
               </button>
               <button 
                 className="edit-btn" 
-                style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}
+                style={{ background: 'var(--success-50)', color: 'var(--success-700)' }}
                 onClick={() => viewCustomerHistory(customer)}
               >
                 <FaHistory /> Riwayat
@@ -291,24 +291,24 @@ const Customers = () => {
             <h2>Riwayat Transaksi Pelanggan</h2>
             
             {selectedCustomerTransactions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-                <FaHistory size={50} style={{ marginBottom: '15px' }} />
+              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--gray-400)' }}>
+                <FaHistory size={50} style={{ marginBottom: '15px', opacity: 0.3 }} />
                 <p>Belum ada transaksi</p>
               </div>
             ) : (
               <div style={{ maxHeight: '500px', overflowY: 'auto', marginTop: '20px' }}>
                 {selectedCustomerTransactions.map(transaction => (
                   <div key={transaction.id} style={{
-                    background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                    background: 'var(--gray-25)',
                     padding: '16px',
                     borderRadius: '10px',
                     marginBottom: '12px',
-                    border: '1px solid #e2e8f0'
+                    border: '1px solid var(--gray-200)'
                   }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                       <div>
-                        <strong style={{ color: '#2196F3' }}>{transaction.invoice_number}</strong>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#718096' }}>
+                        <strong style={{ color: 'var(--brand-600)' }}>{transaction.invoice_number}</strong>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--gray-500)' }}>
                           {new Date(transaction.created_at).toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'long',
@@ -319,7 +319,7 @@ const Customers = () => {
                         </p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '18px', fontWeight: '800', color: '#2196F3' }}>
+                        <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--brand-600)' }}>
                           {formatRupiah(transaction.total)}
                         </div>
                         <span className="category-badge" style={{ fontSize: '11px', marginTop: '4px' }}>
@@ -327,7 +327,7 @@ const Customers = () => {
                         </span>
                       </div>
                     </div>
-                    <div style={{ fontSize: '13px', color: '#4a5568' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--gray-600)' }}>
                       <strong>Items:</strong> {JSON.parse(transaction.items || '[]').length} produk
                     </div>
                   </div>
