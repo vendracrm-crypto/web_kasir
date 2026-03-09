@@ -46,9 +46,35 @@ router.get('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'Customer not found' });
     }
     
-    const [transactions] = await db.query('SELECT * FROM transactions WHERE customer_id = ?', [req.params.id]);
+    const [transactions] = await db.query(
+      `SELECT t.* 
+       FROM transactions t 
+       WHERE t.customer_id = ? 
+       ORDER BY t.created_at DESC`,
+      [req.params.id]
+    );
     
-    const customer = customers[0];
+    // Get items for each transaction
+    const formattedTransactions = [];
+    for (const t of transactions) {
+      const [items] = await db.query(
+        `SELECT ti.*, p.name, p.sku 
+         FROM transaction_items ti
+         LEFT JOIN products p ON ti.product_id = p.id
+         WHERE ti.transaction_id = ?`,
+        [t.id]
+      );
+      formattedTransactions.push({
+        id: t.id,
+        invoice_number: t.invoice_number,
+        total: parseFloat(t.total_amount) || 0,
+        payment_method: t.payment_method,
+        item_count: items.length,
+        items: items,
+        created_at: t.created_at
+      });
+    }
+
     res.json({
       id: customer.id,
       name: customer.name,
@@ -58,7 +84,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
       points: customer.loyalty_points || 0,
       totalSpent: parseFloat(customer.total_spent),
       visitCount: customer.visit_count,
-      transactions
+      transactions: formattedTransactions
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

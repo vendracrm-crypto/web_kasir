@@ -1,0 +1,239 @@
+/* ============================================
+   TRANSACTIONS PAGE STYLES
+   ============================================ */
+
+/* Desktop: Expandable row */
+.trx-row {
+  transition: background 0.15s;
+}
+
+.trx-row:hover {
+  background: var(--gray-50) !important;
+}
+
+.trx-row.expanded {
+  background: var(--brand-25, var(--gray-50)) !important;
+}
+
+.trx-detail-row td {
+  background: var(--gray-25) !important;
+}
+
+.trx-detail-panel {
+  padding: 16px 20px 20px;
+  border-top: 2px solid var(--brand-500);
+}
+
+.trx-detail-header h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-700);
+  margin: 0 0 12px 0;
+}
+
+.trx-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.trx-items-table th {
+  background: var(--gray-100);
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.trx-items-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.trx-detail-summary {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gray-200);
+  max-width: 300px;
+  margin-left: auto;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.summary-row.total {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--brand-600);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-200);
+  margin-bottom: 4px;
+}
+
+/* Mobile Card View */
+.trx-mobile-list {
+  display: none;
+}
+
+.trx-mobile-list.mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .trx-mobile-list.mobile-view {
+    display: flex;
+  }
+}
+
+.trx-mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.trx-mobile-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+
+.trx-mobile-header {
+  padding: 14px 16px;
+  cursor: pointer;
+}
+
+.trx-mobile-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.trx-mobile-invoice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.trx-mobile-date {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-top: 2px;
+  display: block;
+}
+
+.trx-mobile-total {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.trx-amount {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--brand-600);
+}
+
+.trx-mobile-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--gray-500);
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-100);
+}
+
+/* Mobile Detail */
+.trx-mobile-detail {
+  border-top: 2px solid var(--brand-500);
+  background: var(--gray-25);
+  padding: 12px 16px 16px;
+}
+
+.trx-mobile-items-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray-700);
+  margin-bottom: 10px;
+}
+
+.trx-mobile-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.trx-mobile-item:last-of-type {
+  border-bottom: none;
+}
+
+.trx-mobile-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.trx-mobile-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.trx-mobile-item-sku {
+  font-size: 11px;
+  color: var(--gray-400);
+}
+
+.trx-mobile-item-calc {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+}
+
+.trx-mobile-item-calc span:first-child {
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+.trx-mobile-item-subtotal {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.trx-mobile-summary {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.trx-mobile-sum-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.trx-mobile-sum-row.total {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--brand-600);
+  padding: 6px 0;
+}

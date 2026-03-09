@@ -181,12 +181,12 @@
 }
 
 /* Mobile View Toggle */
-.mobile-view { display: none; }
+.mobile-view { display: none !important; }
 .desktop-view { display: block; }
 
 @media (max-width: 768px) {
-  .desktop-view { display: none; }
-  .mobile-view { display: block; }
+  .desktop-view { display: none !important; }
+  .mobile-view { display: flex !important; }
 }
 
 /* Product Cards (Mobile) */
@@ -516,8 +516,8 @@
 }
 
 /* Desktop-only / Mobile-only (Users page) */
-.desktop-only { display: block; }
-.mobile-only { display: none; }
+.desktop-only { display: block !important; }
+.mobile-only { display: none !important; }
 
 @media (max-width: 768px) {
   .desktop-only { display: none !important; }

@@ -14,7 +14,7 @@ const Users = () => {
     password: '',
     name: '',
     email: '',
-    role: 'kasir'
+    role: 'admin'
   });
   const [newPassword, setNewPassword] = useState('');
 
@@ -110,7 +110,7 @@ const Users = () => {
       password: '',
       name: '',
       email: '',
-      role: 'kasir'
+      role: 'admin'
     });
     setEditingUser(null);
     setShowModal(false);
@@ -262,7 +262,6 @@ const Users = () => {
                   onChange={(e) => setFormData({...formData, role: e.target.value})}
                   required
                 >
-                  <option value="kasir">Kasir</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
-import { FaSearch, FaShoppingCart, FaTrash, FaPlus, FaMinus, FaMoneyBillWave, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaShoppingCart, FaTrash, FaPlus, FaMinus, FaMoneyBillWave, FaTimes, FaFilePdf, FaCheckCircle } from 'react-icons/fa';
+import { jsPDF } from 'jspdf';
 import './Kasir.css';
 
 const Kasir = () => {
@@ -16,6 +17,7 @@ const Kasir = () => {
   const [discount, setDiscount] = useState(0);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showMobileProducts, setShowMobileProducts] = useState(false);
+  const [receiptData, setReceiptData] = useState(null);
 
   useEffect(() => {
     fetchProducts();
@@ -160,7 +162,26 @@ const Kasir = () => {
       const response = await axios.post('/transactions', transactionData);
       console.log('Transaction response:', response.data);
       
-      alert('Transaksi berhasil!');
+      // Save receipt data before resetting
+      setReceiptData({
+        invoiceNumber: response.data.invoiceNumber || response.data.invoice_number || 'INV-' + Date.now(),
+        createdAt: new Date().toISOString(),
+        cashier: response.data.cashier || '-',
+        customer: selectedCustomer?.name || 'Pelanggan Umum',
+        items: cart.map(item => ({
+          name: item.name,
+          sku: item.sku || '-',
+          quantity: item.quantity,
+          unit_price: item.price,
+          subtotal: item.price * item.quantity
+        })),
+        subtotal: calculateSubtotal(),
+        discount: discount,
+        total: calculateTotal(),
+        paymentMethod: paymentMethod,
+        amountPaid: paid,
+        change: paid - calculateTotal()
+      });
       
       // Reset
       setCart([]);
@@ -168,7 +189,7 @@ const Kasir = () => {
       setDiscount(0);
       setShowCheckout(false);
       setSelectedCustomer(null);
-      fetchProducts(); // Refresh products to update stock
+      fetchProducts();
     } catch (error) {
       console.error('Transaction error:', error.response || error);
       alert('Transaksi gagal: ' + (error.response?.data?.message || error.message));
@@ -181,6 +202,95 @@ const Kasir = () => {
       currency: 'IDR',
       minimumFractionDigits: 0
     }).format(amount);
+  };
+
+  const downloadReceiptPDF = (data) => {
+    const itemCount = data.items ? data.items.length : 0;
+    const pageH = Math.max(90 + (itemCount * 10) + (data.discount > 0 ? 5 : 0), 120);
+    const doc = new jsPDF({ unit: 'mm', format: [80, pageH] });
+    const w = 80;
+    let y = 8;
+    const leftX = 5;
+    const rightX = w - 5;
+
+    const dash = (yPos) => {
+      for (let x = leftX; x < rightX; x += 2) doc.line(x, yPos, x + 1, yPos);
+    };
+
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('KASIR VENDRA', w / 2, y, { align: 'center' });
+    y += 5;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('kasir.vendra.software', w / 2, y, { align: 'center' });
+    y += 5;
+    dash(y); y += 5;
+
+    doc.text('No. Invoice', leftX, y);
+    doc.text(String(data.invoiceNumber), rightX, y, { align: 'right' });
+    y += 4;
+    doc.text('Tanggal', leftX, y);
+    doc.text(new Date(data.createdAt).toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    }), rightX, y, { align: 'right' });
+    y += 4;
+    doc.text('Kasir', leftX, y);
+    doc.text(String(data.cashier || '-'), rightX, y, { align: 'right' });
+    y += 4;
+    doc.text('Pelanggan', leftX, y);
+    doc.text(String(data.customer), rightX, y, { align: 'right' });
+    y += 5;
+    dash(y); y += 5;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Item', leftX, y);
+    doc.text('Subtotal', rightX, y, { align: 'right' });
+    y += 4;
+    doc.setFont('helvetica', 'normal');
+
+    data.items.forEach(item => {
+      const name = String(item.name || 'Produk');
+      doc.text(name.length > 22 ? name.substring(0, 22) + '..' : name, leftX, y);
+      y += 3.5;
+      doc.setFontSize(7);
+      doc.text('  ' + item.quantity + ' x ' + formatRupiah(item.unit_price), leftX, y);
+      doc.text(formatRupiah(item.subtotal), rightX, y, { align: 'right' });
+      doc.setFontSize(8);
+      y += 5;
+    });
+
+    dash(y); y += 5;
+
+    if (data.discount > 0) {
+      doc.text('Diskon', leftX, y);
+      doc.text('-' + formatRupiah(data.discount), rightX, y, { align: 'right' });
+      y += 4;
+    }
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TOTAL', leftX, y);
+    doc.text(formatRupiah(data.total), rightX, y, { align: 'right' });
+    y += 5;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Bayar (' + String(data.paymentMethod) + ')', leftX, y);
+    doc.text(formatRupiah(data.amountPaid), rightX, y, { align: 'right' });
+    y += 4;
+    doc.text('Kembalian', leftX, y);
+    doc.text(formatRupiah(data.change || 0), rightX, y, { align: 'right' });
+    y += 5;
+    dash(y); y += 5;
+
+    doc.setFontSize(8);
+    doc.text('Terima kasih atas kunjungan Anda!', w / 2, y, { align: 'center' });
+    y += 4;
+    doc.setFontSize(7);
+    doc.text('Barang yang sudah dibeli tidak dapat', w / 2, y, { align: 'center' });
+    y += 3;
+    doc.text('ditukar atau dikembalikan', w / 2, y, { align: 'center' });
+
+    doc.save('struk_' + String(data.invoiceNumber) + '.pdf');
   };
 
   return (
@@ -473,6 +583,75 @@ const Kasir = () => {
           </div>
         </div>
       </div>
+
+      {/* Receipt Modal */}
+      {receiptData && (
+        <div className="receipt-overlay">
+          <div className="receipt-modal">
+            <div className="receipt-success">
+              <FaCheckCircle size={50} color="#22c55e" />
+              <h2>Transaksi Berhasil!</h2>
+            </div>
+            
+            <div className="receipt-paper">
+              <div className="receipt-header">
+                <h3>KASIR VENDRA</h3>
+                <p>kasir.vendra.software</p>
+              </div>
+              
+              <div className="receipt-divider"></div>
+              
+              <div className="receipt-info">
+                <div className="receipt-row"><span>No. Invoice</span><span>{receiptData.invoiceNumber}</span></div>
+                <div className="receipt-row"><span>Tanggal</span><span>{new Date(receiptData.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span></div>
+                <div className="receipt-row"><span>Kasir</span><span>{receiptData.cashier}</span></div>
+                <div className="receipt-row"><span>Pelanggan</span><span>{receiptData.customer}</span></div>
+              </div>
+              
+              <div className="receipt-divider"></div>
+              
+              <div className="receipt-items">
+                {receiptData.items.map((item, idx) => (
+                  <div key={idx} className="receipt-item">
+                    <div className="receipt-item-name">{item.name}</div>
+                    <div className="receipt-item-detail">
+                      <span>{item.quantity} x {formatRupiah(item.unit_price)}</span>
+                      <span>{formatRupiah(item.subtotal)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="receipt-divider"></div>
+              
+              <div className="receipt-summary">
+                {receiptData.discount > 0 && (
+                  <div className="receipt-row"><span>Diskon</span><span style={{color:'#ef4444'}}>-{formatRupiah(receiptData.discount)}</span></div>
+                )}
+                <div className="receipt-row receipt-total"><span>TOTAL</span><span>{formatRupiah(receiptData.total)}</span></div>
+                <div className="receipt-row"><span>Bayar ({receiptData.paymentMethod})</span><span>{formatRupiah(receiptData.amountPaid)}</span></div>
+                <div className="receipt-row"><span>Kembalian</span><span>{formatRupiah(receiptData.change)}</span></div>
+              </div>
+              
+              <div className="receipt-divider"></div>
+              
+              <div className="receipt-footer">
+                <p>Terima kasih atas kunjungan Anda!</p>
+                <p className="receipt-note">Barang yang sudah dibeli tidak dapat ditukar atau dikembalikan</p>
+              </div>
+            </div>
+            
+            <div className="receipt-actions">
+              <button className="receipt-download-btn" onClick={() => downloadReceiptPDF(receiptData)}>
+                <FaFilePdf /> Download Struk PDF
+              </button>
+              <button className="receipt-close-btn" onClick={() => setReceiptData(null)}>
+                Transaksi Baru
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

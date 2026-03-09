@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../api/axios';
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaStar, FaHistory } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaStar, FaHistory, FaDownload } from 'react-icons/fa';
 import './Products.css';
 
 const Customers = () => {
@@ -111,13 +111,49 @@ const Customers = () => {
     }).format(amount);
   };
 
+  const downloadCSV = () => {
+    const headers = ['Nama', 'Telepon', 'Email', 'Alamat', 'Poin', 'Total Belanja', 'Kunjungan'];
+    const rows = filteredCustomers.map(c => [
+      c.name,
+      c.phone,
+      c.email || '',
+      (c.address || '').replace(/[\n\r]+/g, ' '),
+      c.points,
+      c.totalSpent,
+      c.visitCount
+    ]);
+
+    const escapeCSV = (val) => {
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    };
+
+    const csvContent = [headers.map(escapeCSV).join(','), ...rows.map(r => r.map(escapeCSV).join(','))].join('\n');
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `data_pelanggan_${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="products-page">
       <div className="page-header">
         <h1>Manajemen Pelanggan</h1>
-        <button className="add-btn" onClick={() => setShowModal(true)}>
-          <FaPlus /> Tambah Pelanggan
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="add-btn" onClick={downloadCSV} style={{ background: 'var(--success-600)' }}>
+            <FaDownload /> Download CSV
+          </button>
+          <button className="add-btn" onClick={() => setShowModal(true)}>
+            <FaPlus /> Tambah Pelanggan
+          </button>
+        </div>
       </div>
 
       <div className="search-bar">
@@ -305,10 +341,10 @@ const Customers = () => {
                     marginBottom: '12px',
                     border: '1px solid var(--gray-200)'
                   }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                       <div>
-                        <strong style={{ color: 'var(--brand-600)' }}>{transaction.invoice_number}</strong>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--gray-500)' }}>
+                        <strong style={{ color: 'var(--brand-600)', fontSize: '14px' }}>{transaction.invoice_number}</strong>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: 'var(--gray-500)' }}>
                           {new Date(transaction.created_at).toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'long',
@@ -319,7 +355,7 @@ const Customers = () => {
                         </p>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '18px', fontWeight: '800', color: 'var(--brand-600)' }}>
+                        <div style={{ fontSize: '16px', fontWeight: '800', color: 'var(--brand-600)' }}>
                           {formatRupiah(transaction.total)}
                         </div>
                         <span className="category-badge" style={{ fontSize: '11px', marginTop: '4px' }}>
@@ -327,9 +363,46 @@ const Customers = () => {
                         </span>
                       </div>
                     </div>
-                    <div style={{ fontSize: '13px', color: 'var(--gray-600)' }}>
-                      <strong>Items:</strong> {JSON.parse(transaction.items || '[]').length} produk
-                    </div>
+                    
+                    {/* Items Detail */}
+                    {transaction.items && transaction.items.length > 0 && (
+                      <div style={{ 
+                        background: 'white', 
+                        borderRadius: '8px', 
+                        padding: '10px 12px',
+                        border: '1px solid var(--gray-100)'
+                      }}>
+                        {transaction.items.map((item, idx) => (
+                          <div key={idx} style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '6px 0',
+                            borderBottom: idx < transaction.items.length - 1 ? '1px solid var(--gray-100)' : 'none',
+                            fontSize: '13px'
+                          }}>
+                            <div>
+                              <span style={{ fontWeight: '600', color: 'var(--gray-800)' }}>
+                                {item.name || 'Produk'}
+                              </span>
+                              {item.sku && (
+                                <span style={{ fontSize: '11px', color: 'var(--gray-400)', marginLeft: '6px' }}>
+                                  ({item.sku})
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                              <span style={{ color: 'var(--gray-500)', marginRight: '8px' }}>
+                                {item.quantity} x {formatRupiah(item.unit_price)}
+                              </span>
+                              <span style={{ fontWeight: '600', color: 'var(--gray-800)' }}>
+                                {formatRupiah(item.subtotal)}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
