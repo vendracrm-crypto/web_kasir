@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   FaHome, FaCashRegister, FaBox, FaUsers, 
-  FaChartLine, FaWarehouse, FaReceipt, FaBars, FaSignOutAlt, FaCog 
+  FaChartLine, FaWarehouse, FaReceipt, FaBars, FaSignOutAlt, FaCog,
+  FaTimes, FaUserCircle
 } from 'react-icons/fa';
 import './Layout.css';
 
@@ -11,9 +12,18 @@ const Layout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Set sidebar default: open for desktop, closed for mobile
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(true);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -34,56 +44,92 @@ const Layout = () => {
     menuItems.push({ path: '/pengaturan', icon: <FaCog />, label: 'Pengaturan' });
   }
 
+  const bottomNavLeft = [
+    { path: '/', icon: <FaHome />, label: 'Home' },
+    { path: '/products', icon: <FaBox />, label: 'Produk' },
+  ];
+
+  const bottomNavRight = [
+    { path: '/transactions', icon: <FaReceipt />, label: 'Transaksi' },
+    { path: '/reports', icon: <FaChartLine />, label: 'Laporan' },
+  ];
+
   return (
     <div className="layout">
       {/* Sidebar Overlay for Mobile */}
       <div 
-        className={`sidebar-overlay ${sidebarOpen ? 'show' : ''}`}
+        className={`sidebar-overlay ${sidebarOpen && isMobile ? 'show' : ''}`}
         onClick={() => setSidebarOpen(false)}
-      ></div>
+      />
 
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
-          <div style={{ width: 32, height: 32, background: 'var(--brand-500)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <FaCashRegister style={{ color: 'white', fontSize: 16 }} />
+          <div className="sidebar-logo">
+            <FaCashRegister />
           </div>
           <h2>Vendra Kasir</h2>
+          {isMobile && (
+            <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
+              <FaTimes />
+            </button>
+          )}
         </div>
+
         <nav className="sidebar-nav">
+          <div className="nav-section-label">MENU</div>
           {menuItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
-              onClick={() => {
-                // Close sidebar on mobile when menu clicked
-                if (window.innerWidth <= 768) {
-                  setSidebarOpen(false);
-                }
-              }}
+              onClick={() => { if (isMobile) setSidebarOpen(false); }}
             >
               <span className="nav-icon">{item.icon}</span>
-              {sidebarOpen && <span className="nav-label">{item.label}</span>}
+              <span className="nav-label">{item.label}</span>
+              {location.pathname === item.path && <span className="nav-active-dot" />}
             </Link>
           ))}
         </nav>
+
+        <div className="sidebar-footer">
+          <div className="sidebar-user">
+            <FaUserCircle className="sidebar-user-avatar" />
+            <div className="sidebar-user-info">
+              <span className="sidebar-user-name">{user?.name}</span>
+              <span className="sidebar-user-role">{user?.role}</span>
+            </div>
+          </div>
+          <button className="sidebar-logout" onClick={handleLogout}>
+            <FaSignOutAlt />
+            <span>Logout</span>
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <div className="main-content">
+      <div className={`main-content ${sidebarOpen && !isMobile ? '' : 'full'}`}>
         {/* Header */}
         <header className="header">
-          <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <FaBars />
-          </button>
+          <div className="header-left">
+            <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <FaBars />
+            </button>
+            <h1 className="header-title">
+              {menuItems.find(m => m.path === location.pathname)?.label || 'Dashboard'}
+            </h1>
+          </div>
           <div className="header-right">
-            <div className="user-info">
-              <span className="user-name">{user?.name}</span>
-              <span className="user-role">{user?.role}</span>
+            <div className="header-user">
+              <FaUserCircle className="header-avatar" />
+              <div className="user-info">
+                <span className="user-name">{user?.name}</span>
+                <span className="user-role">{user?.role}</span>
+              </div>
             </div>
             <button className="logout-btn" onClick={handleLogout}>
-              <FaSignOutAlt /> Logout
+              <FaSignOutAlt />
+              <span>Logout</span>
             </button>
           </div>
         </header>
@@ -92,31 +138,50 @@ const Layout = () => {
         <main className="content">
           <Outlet />
         </main>
-
-        {/* Bottom Navigation for Mobile */}
-        <nav className="bottom-nav">
-          <Link to="/" className={`bottom-nav-item ${location.pathname === '/' ? 'active' : ''}`}>
-            <FaHome />
-            <span>Home</span>
-          </Link>
-          <Link to="/kasir" className={`bottom-nav-item ${location.pathname === '/kasir' ? 'active' : ''}`}>
-            <FaCashRegister />
-            <span>Kasir</span>
-          </Link>
-          <Link to="/products" className={`bottom-nav-item ${location.pathname === '/products' ? 'active' : ''}`}>
-            <FaBox />
-            <span>Produk</span>
-          </Link>
-          <Link to="/transactions" className={`bottom-nav-item ${location.pathname === '/transactions' ? 'active' : ''}`}>
-            <FaReceipt />
-            <span>Transaksi</span>
-          </Link>
-          <Link to="/reports" className={`bottom-nav-item ${location.pathname === '/reports' ? 'active' : ''}`}>
-            <FaChartLine />
-            <span>Laporan</span>
-          </Link>
-        </nav>
       </div>
+
+      {/* Bottom Navigation for Mobile */}
+      <nav className="bottom-nav">
+        <div className="bottom-nav-side">
+          {bottomNavLeft.map(item => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`bottom-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+            >
+              <span className="bottom-nav-icon">{item.icon}</span>
+              <span className="bottom-nav-label">{item.label}</span>
+            </Link>
+          ))}
+        </div>
+
+        <div className="bottom-nav-center">
+          <Link
+            to="/kasir"
+            className={`bottom-nav-fab ${location.pathname === '/kasir' ? 'active' : ''}`}
+          >
+            <FaCashRegister />
+          </Link>
+          <span className="bottom-nav-fab-label">Kasir</span>
+        </div>
+
+        <div className="bottom-nav-side">
+          {bottomNavRight.map(item => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`bottom-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+            >
+              <span className="bottom-nav-icon">{item.icon}</span>
+              <span className="bottom-nav-label">{item.label}</span>
+            </Link>
+          ))}
+          <button className="bottom-nav-item" onClick={() => setSidebarOpen(true)}>
+            <span className="bottom-nav-icon"><FaBars /></span>
+            <span className="bottom-nav-label">Menu</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };

@@ -9,13 +9,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'https://kasir-pos-capstone.vercel.app',
-    'https://kasir-pos-capstone-git-main-galang0304s-projects.vercel.app',
-    'https://kasir-pos-capstone-galang0304s-projects.vercel.app',
-    process.env.FRONTEND_URL
-  ].filter(Boolean),
+  origin: true,
   credentials: true
 }));
 app.use(bodyParser.json());
@@ -30,17 +24,11 @@ app.use('/api/customers', require('./routes/customers'));
 app.use('/api/reports', require('./routes/reports'));
 app.use('/api/inventory', require('./routes/inventory'));
 
-// Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-  });
-}
+// Serve static frontend build
+app.use(express.static(path.join(__dirname, '../client/build')));
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Web Kasir API' });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 app.listen(PORT, () => {
